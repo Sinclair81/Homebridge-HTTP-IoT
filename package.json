@@ -1,6 +1,6 @@
 {
   "name": "homebridge-http-iot",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "model": "HTTP-IoT Lightbulb",
   "description": "Control your IoT device with HTTP requests.",
   "main": "dist/index.js",

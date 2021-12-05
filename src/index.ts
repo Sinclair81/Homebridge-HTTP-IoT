@@ -234,7 +234,9 @@ class HttpIotLightbulb implements AccessoryPlugin {
           }
           this.lightbulbService.updateCharacteristic(this.api.hap.Characteristic.Brightness, this.accStates.Brightness);
         } else {
-          this.log.info("Current Brightness is not correct: '%s'! [0 - 100]", brightnessString.trim());
+          if (this.config.debugMsgLog) {
+            this.log.info("Current Brightness is not correct: '%s'! [0 - 100]", brightnessString.trim());
+          }
         }
       })
       .catch( (error: any) => {
@@ -292,7 +294,9 @@ class HttpIotLightbulb implements AccessoryPlugin {
           }
           this.lightbulbService.updateCharacteristic(this.api.hap.Characteristic.Hue, this.accStates.Hue);
         } else {
-          this.log.info("Current Hue is not correct: '%s' (>> %i)! [0 - 360]", hueString.trim(), newHue);
+          if (this.config.debugMsgLog) {
+            this.log.info("Current Hue is not correct: '%s' (>> %i)! [0 - 360]", hueString.trim(), newHue);
+          }
         }
       })
       .catch( (error: any) => {
@@ -355,7 +359,9 @@ class HttpIotLightbulb implements AccessoryPlugin {
           }
           this.lightbulbService.updateCharacteristic(this.api.hap.Characteristic.ColorTemperature, this.accStates.ColorTemperature);
         } else {
-          this.log.info("Current Color Temperature is not correct: '%s' (>> %i mired)! [140 - 500 mired] [mired = 1000000 / kelvin]", colorTemperatureString.trim(), newColorTemperature);
+          if (this.config.debugMsgLog) {
+            this.log.info("Current Color Temperature is not correct: '%s' (>> %i mired)! [140 - 500 mired] [mired = 1000000 / kelvin]", colorTemperatureString.trim(), newColorTemperature);
+          }
         }
       })
       .catch( (error: any) => {
