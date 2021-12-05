@@ -1,3 +1,7 @@
+<p align="center">
+<img src="https://github.com/homebridge/branding/raw/master/logos/homebridge-wordmark-logo-vertical.png" width="150">
+</p>
+
 # Homebridge HTTP IoT #
 
 [![npm version](https://badge.fury.io/js/homebridge-http-iot.svg)](https://badge.fury.io/js/homebridge-http-iot)
