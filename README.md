@@ -82,6 +82,7 @@ Name                                         | Value                       | Req
 `lightbulbSetColorTemperature.url`           | "http://10.0.0.100/api/..." | yes*     | The url for color temperature control.  
 `lightbulbSetColorTemperature.method`        | "POST"                      | yes*     | The HTTP method.  
 `lightbulbSetColorTemperature.replaceNumber` | "%color_temp%"              | no       | This string is replace with the value in the url. If not set, the value is add to the url.  
+`lightbulbSetColorTemperature.unit`          | "kelvin"                    | no       | Set unit to `"kelvin"` if the device supports Kelvin instead of HomeKit unit Mired. (Mired = 1,000,000 / Kelvin)  
 
 ## Example Configuration ##
 
