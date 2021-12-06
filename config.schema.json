@@ -1,0 +1,236 @@
+{
+    "pluginAlias": "HTTP-IoT",
+    "pluginType": "accessory",
+    "singular": false,
+    "schema": {
+        "type": "object",
+        "properties": {
+            "name": {
+                "title": "Name",
+                "type": "string",
+                "required": true,
+                "default": "HTTP-IoT Accessory"
+            },
+            "updateInterval": {
+                "title": "Update Interval (in MS)",
+                "type": "number",
+                "placeholder": "30000"
+            },
+            "debugMsgLog": {
+                "title": "Debug Msg Log (On / Off)",
+                "type": "number",
+                "placeholder": "0"
+            },
+              
+            "lightbulbGetOn": {
+                "required": true,
+                "type": "object",
+                "properties": {
+                    "url": {
+                        "title": "Url",
+                        "type": "string",
+                        "required": true,
+                        "default": "http://10.0.0.100/api/v1/led?power"
+                    },
+                    "method": {
+                        "title": "Method",
+                        "type": "string",
+                        "required": true,
+                        "default": "GET"
+                    },
+                    "pattern": {
+                        "title": "Pattern",
+                        "type": "string",
+                        "required": true,
+                        "default": "power: 1",
+                        "description": "The response for a ON state."
+                    }
+                }
+            },
+            "lightbulbSetOn": {
+                "required": true,
+                "type": "object",
+                "properties": {
+                    "url": {
+                        "title": "Url",
+                        "type": "string",
+                        "required": true,
+                        "default": "http://10.0.0.100/api/v1/led?power=1"
+                    },
+                    "method": {
+                        "title": "Method",
+                        "type": "string",
+                        "required": true,
+                        "default": "POST"
+                    }
+                }
+            },
+            "lightbulbSetOff": {
+                "required": true,
+                "type": "object",
+                "properties": {
+                    "url": {
+                        "title": "Url",
+                        "type": "string",
+                        "required": true,
+                        "default": "http://10.0.0.100/api/v1/led?power=0"
+                    },
+                    "method": {
+                        "title": "Method",
+                        "type": "string",
+                        "required": true,
+                        "default": "POST"
+                    }
+                }
+            },
+
+            "lightbulbGetBrightness": {
+              "type": "object",
+              "properties": {
+                  "url": {
+                      "title": "Url (required for Brightness)",
+                      "type": "string",
+                      "placeholder": "http://10.0.0.100/api/v1/led?brightness"
+                  },
+                  "method": {
+                      "title": "Method (required for Brightness)",
+                      "type": "string",
+                      "placeholder": "GET"
+                  },
+                  "removeBefore": {
+                      "title": "Remove Before",
+                      "type": "string",
+                      "placeholder": "brightness: ",
+                      "description": "Remove this strirng in the response before the value."
+                  },
+                  "removeAfter": {
+                      "title": "Remove After",
+                      "type": "string",
+                      "placeholder": "",
+                      "description": "Remove this strirng in the response after the value."
+                  }
+              }
+            },
+            "lightbulbSetBrightness": {
+                "type": "object",
+                "properties": {
+                    "url": {
+                        "title": "Url (required for Brightness)",
+                        "type": "string",
+                        "placeholder": "http://10.0.0.100/api/v1/led?brightness=%brightness%"
+                    },
+                    "method": {
+                        "title": "Method (required for Brightness)",
+                        "type": "string",
+                        "placeholder": "POST"
+                    },
+                    "replaceNumber": {
+                        "title": "Replace Number",
+                        "type": "string",
+                        "placeholder": "%brightness%",
+                        "description": "Replace this strirng in the url with the value. If not set, the value is add to the end of the url."
+                    }
+                }
+            },
+
+            "lightbulbGetHue": {
+              "type": "object",
+              "properties": {
+                  "url": {
+                      "title": "Url (required for Hue)",
+                      "type": "string",
+                      "placeholder": "http://10.0.0.100/api/v1/led?hue"
+                  },
+                  "method": {
+                      "title": "Method (required for Hue)",
+                      "type": "string",
+                      "placeholder": "GET"
+                  },
+                  "removeBefore": {
+                      "title": "Remove Before",
+                      "type": "string",
+                      "placeholder": "hue: ",
+                      "description": "Remove this strirng in the response before the value."
+                  },
+                  "removeAfter": {
+                      "title": "Remove After",
+                      "type": "string",
+                      "placeholder": "",
+                      "description": "Remove this strirng in the response after the value."
+                  }
+              }
+            },
+            "lightbulbSetHue": {
+                "type": "object",
+                "properties": {
+                    "url": {
+                        "title": "Url (required for Hue)",
+                        "type": "string",
+                        "placeholder": "http://10.0.0.100/api/v1/led?hue=%hue%"
+                    },
+                    "method": {
+                        "title": "Method (required for Hue)",
+                        "type": "string",
+                        "placeholder": "POST"
+                    },
+                    "replaceNumber": {
+                        "title": "Replace Number",
+                        "type": "string",
+                        "placeholder": "%hue%",
+                        "description": "Replace this strirng in the url with the value. If not set, the value is add to the end of the url."
+                    }
+                }
+            },
+
+            "lightbulbGetColorTemperature": {
+              "type": "object",
+              "properties": {
+                  "url": {
+                      "title": "Url (required for Color Temperature)",
+                      "type": "string",
+                      "placeholder": "http://10.0.0.100/api/v1/led?color_temp"
+                  },
+                  "method": {
+                      "title": "Method (required for Color Temperature)",
+                      "type": "string",
+                      "placeholder": "GET"
+                  },
+                  "removeBefore": {
+                      "title": "Remove Before",
+                      "type": "string",
+                      "placeholder": "color_temp: ",
+                      "description": "Remove this strirng in the response before the value."
+                  },
+                  "removeAfter": {
+                      "title": "Remove After",
+                      "type": "string",
+                      "placeholder": "",
+                      "description": "Remove this strirng in the response after the value."
+                  }
+              }
+            },
+            "lightbulbSetColorTemperature": {
+                "type": "object",
+                "properties": {
+                    "url": {
+                        "title": "Url (required for Color Temperature)",
+                        "type": "string",
+                        "placeholder": "http://10.0.0.100/api/v1/led?color_temp=%color_temp%"
+                    },
+                    "method": {
+                        "title": "Method (required for Color Temperature)",
+                        "type": "string",
+                        "placeholder": "POST"
+                    },
+                    "replaceNumber": {
+                        "title": "Replace Number",
+                        "type": "string",
+                        "placeholder": "%color_temp%",
+                        "description": "Replace this strirng in the url with the value. If not set, the value is add to the end of the url."
+                    }
+                }
+            }
+        
+        }
+    }
+}
