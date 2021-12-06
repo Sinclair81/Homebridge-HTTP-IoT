@@ -19,6 +19,10 @@
     // "forceConsistentCasingInFileNames": true
   },
   "include": [
-    "src"
+    // "src"
+    "src/"
+  ],
+  "exclude": [
+    "**/*.spec.ts"
   ]
 }
