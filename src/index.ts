@@ -51,15 +51,17 @@ class HttpIotLightbulb implements AccessoryPlugin {
     this.errorCheck();
 
     this.lightbulbService = new hap.Service.Lightbulb(this.name);
-    this.lightbulbService.getCharacteristic(hap.Characteristic.On)
-      .on(CharacteristicEventTypes.GET, async (callback: CharacteristicGetCallback) => {
-        callback(undefined, this.accStates.On);
-        this.updateOn();
-      })
-      .on(CharacteristicEventTypes.SET, async (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
-        this.setOn(value);
-        callback();
-      });
+    if (this.checkOnOff()) {
+      this.lightbulbService.getCharacteristic(hap.Characteristic.On)
+        .on(CharacteristicEventTypes.GET, async (callback: CharacteristicGetCallback) => {
+          callback(undefined, this.accStates.On);
+          this.updateOn();
+        })
+        .on(CharacteristicEventTypes.SET, async (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
+          this.setOn(value);
+          callback();
+        });
+    }
 
     if (this.checkBrightness()) {
       this.lightbulbService.getCharacteristic(hap.Characteristic.Brightness)
@@ -105,7 +107,9 @@ class HttpIotLightbulb implements AccessoryPlugin {
 
     if (this.config.updateIntervall) {
       setInterval(() => {
-        this.updateOn();
+        if (this.checkOnOff()) {
+          this.updateOn();
+        }
         if (this.checkBrightness()) {
           this.updateBrightness();
         }
@@ -122,10 +126,21 @@ class HttpIotLightbulb implements AccessoryPlugin {
   }
 
   errorCheck() {
-    if (!this.config.lightbulbGetOn.url || !this.config.lightbulbGetOn.method || !this.config.lightbulbGetOn.pattern || 
+    if (this.config.lightbulbGetOn && this.config.lightbulbSetOn && this.config.lightbulbSetOff) {
+      if (!this.config.lightbulbGetOn.url || !this.config.lightbulbGetOn.method || !this.config.lightbulbGetOn.pattern || 
         !this.config.lightbulbSetOn.url || !this.config.lightbulbSetOn.method || !this.config.lightbulbSetOff.url || !this.config.lightbulbSetOff.method) {
+        this.log.error('Config is not correct!');
+      }
+    } else {
       this.log.error('Config is not correct!');
     }
+  }
+  checkOnOff(): boolean {
+    let check = true;
+    if (!this.config.lightbulbGetOn || !this.config.lightbulbSetOn || !this.config.lightbulbSetOff ) {
+      check = false;
+    }
+    return check;
   }
   checkBrightness(): boolean {
     let check = true;
