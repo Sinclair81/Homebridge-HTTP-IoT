@@ -5,6 +5,8 @@
 # Homebridge HTTP IoT #
 
 [![npm version](https://badge.fury.io/js/homebridge-http-iot.svg)](https://badge.fury.io/js/homebridge-http-iot)
+[![verified-by-homebridge](https://badgen.net/badge/homebridge/verified/purple)](https://github.com/homebridge/homebridge/wiki/Verified-Plugins)
+[![npm](https://img.shields.io/npm/dm/homebridge-http-iot.svg?label=dl)](https://www.npmjs.com/package/homebridge-http-iot)
 [![donate](https://img.shields.io/badge/donate-PayPal-blue.svg)](https://www.paypal.me/Sinclair81)
 
 Control your IoT device with HTTP requests.
