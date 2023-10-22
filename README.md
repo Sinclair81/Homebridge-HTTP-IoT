@@ -1,5 +1,5 @@
 <p align="center">
-<img src="https://github.com/homebridge/branding/blob/latest/logos/homebridge-wordmark-logo-horizontal.png" width="400">
+<img src="https://github.com/homebridge/branding/blob/latest/logos/homebridge-wordmark-logo-horizontal.png" width="300">
 </p>
 
 # Homebridge HTTP IoT #
