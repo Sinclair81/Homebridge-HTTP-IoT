@@ -77,6 +77,8 @@ Name                            | Value                       | Required | Notes
 
 ## Color Temperature Configuration Parameters (is Optional) ##
 
+The Home app in IOS crashes when trying to change this value as a color instead of the color temperature. (10'2023)
+
 Name                                         | Value                       | Required | Notes
 -------------------------------------------- | --------------------------- | -------- | ------------------------
 `lightbulbGetColorTemperature.url`           | "http://10.0.0.100/api/..." | yes*     | The url for color temperature control, to get the state.  
