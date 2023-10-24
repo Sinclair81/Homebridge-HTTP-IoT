@@ -14,15 +14,19 @@ Control your IoT device with HTTP requests.
 __Type of Accessory:__
 
 - Lightbulb
+- Switch
+- Outlet
 
 __Configuration:__
 
-- [Main Configuration](#Homebridge-HTTP-IoT-Main-Configuration-Parameters)  
-- [On Configuration](#On-Configuration-Parameters)  
-- [Brightness Configuration](#Brightness-Configuration-Parameters-(is-Optional))  
-- [Hue Configuration](#Hue-Configuration-Parameters-(is-Optional))  
-- [Color Temperature Configuration](#Color-Temperature-Configuration-Parameters-(is-Optional))  
-- [Example Configuration](#Example-Configuration)  
+- [Main Configuration](#HTTP-IoT-Main-Configuration-Parameters)  
+- [Lightbulb On Configuration](#Lightbulb-On-Configuration-Parameters)  
+- [Lightbulb Brightness Configuration](#Lightbulb-Brightness-Configuration-Parameters-(is-Optional))  
+- [Lightbulb Hue Configuration](#Lightbulb-Hue-Configuration-Parameters-(is-Optional))  
+- [Lightbulb Color Temperature Configuration](#Lightbulb-Color-Temperature-Configuration-Parameters-(is-Optional))  
+- [Lightbulb Example Configuration](#Lightbulb-Example-Configuration)  
+- [Switch Configuration](#Switch-Configuration-Parameters)  
+- [Outlet Configuration](#Outlet-Configuration-Parameters)  
 
 ## Installation ##
 
@@ -30,16 +34,17 @@ __Configuration:__
 2. Install this plugin in your homebridge
 3. Update your configuration file with code like the sample below
 
-## Homebridge HTTP IoT Main Configuration Parameters ##
+## HTTP IoT Main Configuration Parameters ##
 
 Name                     | Value               | Required | Notes
 ------------------------ | ------------------- | -------- | ------------------------
 `accessory`              | "HTTP-IoT"          | yes      | Must be set to `"HTTP-IoT"`.
 `name`                   | (custom)            | yes      | Name of accessory that will appear in homekit app.
+`type`                   | "lightbulb"         | no       | Type of accessory `"lightbulb"`, `"switch"` or `"outlet"`, default is: `"lightbulb"`.
 `updateInterval`         | 0                   | no       | Auto Update Interval in milliseconds, 0 = Off
 `debugMsgLog`            | 0                   | no       | 1 - Displays messages of accessories in the log.
 
-## On Configuration Parameters ##
+## Lightbulb On Configuration Parameters ##
 
 Name                     | Value                       | Required | Notes
 ------------------------ | --------------------------- | -------- | ------------------------
@@ -51,7 +56,7 @@ Name                     | Value                       | Required | Notes
 `lightbulbSetOff.url`    | "http://10.0.0.100/api/..." | yes      | The url for power control, to set OFF.  
 `lightbulbSetOff.method` | "POST"                      | yes      | The HTTP method.  
 
-## Brightness Configuration Parameters (is Optional) ##
+## Lightbulb Brightness Configuration Parameters (is Optional) ##
 
 Name                                   | Value                       | Required | Notes
 -------------------------------------- | --------------------------- | -------- | ------------------------
@@ -63,7 +68,7 @@ Name                                   | Value                       | Required 
 `lightbulbSetBrightness.method`        | "POST"                      | yes*     | The HTTP method.  
 `lightbulbSetBrightness.replaceNumber` | "%brightness%"              | no       | This string is replace with the value in the url. If not set, the value is add to the url.  
 
-## Hue Configuration Parameters (is Optional) ##
+## Lightbulb Hue Configuration Parameters (is Optional) ##
 
 Name                            | Value                       | Required | Notes
 ------------------------------- | --------------------------- | -------- | ------------------------
@@ -75,7 +80,7 @@ Name                            | Value                       | Required | Notes
 `lightbulbSetHue.method`        | "POST"                      | yes*     | The HTTP method.  
 `lightbulbSetHue.replaceNumber` | "%hue%"                     | no       | This string is replace with the value in the url. If not set, the value is add to the url.  
 
-## Color Temperature Configuration Parameters (is Optional) ##
+## Lightbulb Color Temperature Configuration Parameters (is Optional) ##
 
 The Home app in IOS crashes when trying to change this value as a color instead of the color temperature. (10'2023)
 
@@ -90,13 +95,14 @@ Name                                         | Value                       | Req
 `lightbulbSetColorTemperature.replaceNumber` | "%color_temp%"              | no       | This string is replace with the value in the url. If not set, the value is add to the url.  
 `lightbulbSetColorTemperature.unit`          | "kelvin"                    | no       | Set unit to `"kelvin"` if the device supports Kelvin instead of HomeKit unit Mired. (Mired = 1,000,000 / Kelvin)  
 
-## Example Configuration ##
+## Lightbulb Example Configuration ##
 
 ```json
 "accessories": [
         {
             "accessory": "HTTP-IoT",
             "name": "Spöka 2.0",
+            "type": "lightbulb",
             "updateIntervall": 10000,
             "debugMsgLog": 1,
             "lightbulbGetOn": {
@@ -143,6 +149,80 @@ Name                                         | Value                       | Req
                 "method": "POST",
                 "replaceNumber": "%color_temp%",
                 "unit": "kelvin"
+            }
+        }
+    ]
+```
+
+## Switch Configuration Parameters ##
+
+Name                  | Value                       | Required | Notes
+----------------------| --------------------------- | -------- | ------------------------
+`switchGetOn.url`     | "http://10.0.0.100/api/..." | yes      | The url for power control, to get the state.  
+`switchGetOn.method`  | "GET"                       | yes      | The HTTP method.  
+`switchGetOn.pattern` | "power: 1"                  | yes      | The response for a `on` or `1`  
+`switchSetOn.url`     | "http://10.0.0.100/api/..." | yes      | The url for power control, to set ON.  
+`switchSetOn.method`  | "POST"                      | yes      | The HTTP method.  
+`switchSetOff.url`    | "http://10.0.0.100/api/..." | yes      | The url for power control, to set OFF.  
+`switchSetOff.method` | "POST"                      | yes      | The HTTP method.  
+
+```json
+"accessories": [
+        {
+            "accessory": "HTTP-IoT",
+            "name": "HTTP Switch",
+            "type": "switch",
+            "updateIntervall": 10000,
+            "debugMsgLog": 1,
+            "switchGetOn": {
+                "url": "http://10.0.0.100/api/v1/led?power",
+                "method": "GET",
+                "pattern": "power: 1"
+            },
+            "switchSetOn": {
+                "url": "http://10.0.0.100/api/v1/led?power=1",
+                "method": "POST"
+            },
+            "switchSetOff": {
+                "url": "http://10.0.0.100/api/v1/led?power=0",
+                "method": "POST"
+            }
+        }
+    ]
+```
+
+## Outlet Configuration Parameters ##
+
+Name                  | Value                       | Required | Notes
+----------------------| --------------------------- | -------- | ------------------------
+`outletGetOn.url`     | "http://10.0.0.100/api/..." | yes      | The url for power control, to get the state.  
+`outletGetOn.method`  | "GET"                       | yes      | The HTTP method.  
+`outletGetOn.pattern` | "power: 1"                  | yes      | The response for a `on` or `1`  
+`outletSetOn.url`     | "http://10.0.0.100/api/..." | yes      | The url for power control, to set ON.  
+`outletSetOn.method`  | "POST"                      | yes      | The HTTP method.  
+`outletSetOff.url`    | "http://10.0.0.100/api/..." | yes      | The url for power control, to set OFF.  
+`outletSetOff.method` | "POST"                      | yes      | The HTTP method.  
+
+```json
+"accessories": [
+        {
+            "accessory": "HTTP-IoT",
+            "name": "HTTP Outlet",
+            "type": "outlet",
+            "updateIntervall": 10000,
+            "debugMsgLog": 1,
+            "outletGetOn": {
+                "url": "http://10.0.0.100/api/v1/led?power",
+                "method": "GET",
+                "pattern": "power: 1"
+            },
+            "outletSetOn": {
+                "url": "http://10.0.0.100/api/v1/led?power=1",
+                "method": "POST"
+            },
+            "outletSetOff": {
+                "url": "http://10.0.0.100/api/v1/led?power=0",
+                "method": "POST"
             }
         }
     ]

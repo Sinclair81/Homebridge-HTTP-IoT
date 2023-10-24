@@ -21,10 +21,10 @@ let hap: HAP;
 
 export = (api: API) => {
   hap = api.hap;
-  api.registerAccessory("HTTP-IoT", HttpIotLightbulb);
+  api.registerAccessory("HTTP-IoT", HttpIotAccessory);
 };
 
-class HttpIotLightbulb implements AccessoryPlugin {
+class HttpIotAccessory implements AccessoryPlugin {
 
   private readonly log:    Logging;
   private readonly name:   string;
@@ -39,7 +39,7 @@ class HttpIotLightbulb implements AccessoryPlugin {
     Saturation:       0,     // number 0% - 100%
   };
 
-  private readonly lightbulbService: Service;
+  private readonly accessoryService: Service;
   private readonly informationService: Service;
 
   constructor(log: Logging, config: AccessoryConfig, api: API) {
@@ -48,84 +48,142 @@ class HttpIotLightbulb implements AccessoryPlugin {
     this.config = config;
     this.api    = api;
 
-    this.errorCheck();
+    if ((!this.config.type) || (this.config.type == "lightbulb")) {
 
-    this.lightbulbService = new hap.Service.Lightbulb(this.name);
-    if (this.checkOnOff()) {
-      this.lightbulbService.getCharacteristic(hap.Characteristic.On)
-        .on(CharacteristicEventTypes.GET, async (callback: CharacteristicGetCallback) => {
-          callback(undefined, this.accStates.On);
-          this.updateOn();
-        })
-        .on(CharacteristicEventTypes.SET, async (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
-          this.setOn(value);
-          callback();
-        });
+      this.lightbulbErrorCheck();
+      this.accessoryService = new hap.Service.Lightbulb(this.name);
+
+      if (this.lightbulbCheckOnOff()) {
+        this.accessoryService.getCharacteristic(hap.Characteristic.On)
+          .on(CharacteristicEventTypes.GET, async (callback: CharacteristicGetCallback) => {
+            callback(undefined, this.accStates.On);
+            this.lightbulbUpdateOn();
+          })
+          .on(CharacteristicEventTypes.SET, async (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
+            this.lightbulbSetOn(value);
+            callback();
+          });
+      }
+
+      if (this.lightbulbCheckBrightness()) {
+        this.accessoryService.getCharacteristic(hap.Characteristic.Brightness)
+          .on(CharacteristicEventTypes.GET, async (callback: CharacteristicGetCallback) => {
+            callback(undefined, this.accStates.Brightness);
+            this.lightbulbUpdateBrightness();
+          })
+          .on(CharacteristicEventTypes.SET, async (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
+            this.lightbulbSetBrightness(value);
+            callback();
+          });
+      }
+
+      if (this.lightbulbCheckHue()) {
+        this.accessoryService.getCharacteristic(hap.Characteristic.Hue)
+          .on(CharacteristicEventTypes.GET, async (callback: CharacteristicGetCallback) => {
+            callback(undefined, this.accStates.Hue);
+            this.lightbulbUpdateHue();
+          })
+          .on(CharacteristicEventTypes.SET, async (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
+            this.lightbulbSetHue(value);
+            callback();
+          });
+      }
+
+      if (this.lightbulbCheckColorTemperature()) {
+        this.accessoryService.getCharacteristic(hap.Characteristic.ColorTemperature)
+          .on(CharacteristicEventTypes.GET, async (callback: CharacteristicGetCallback) => {
+            callback(undefined, this.accStates.ColorTemperature);
+            this.lightbulbUpdateColorTemperature();
+          })
+          .on(CharacteristicEventTypes.SET, async (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
+            this.lightbulbSetColorTemperature(value);
+            callback();
+          });
+      }
+
+      if (this.config.updateIntervall) {
+        setInterval(() => {
+          if (this.lightbulbCheckOnOff()) {
+            this.lightbulbUpdateOn();
+          }
+          if (this.lightbulbCheckBrightness()) {
+            this.lightbulbUpdateBrightness();
+          }
+          if (this.lightbulbCheckHue()) {
+            this.lightbulbUpdateHue();
+          }
+          if (this.lightbulbCheckColorTemperature()) {
+            this.lightbulbUpdateColorTemperature();
+          }
+        }, this.config.updateIntervall);
+      }
+
     }
 
-    if (this.checkBrightness()) {
-      this.lightbulbService.getCharacteristic(hap.Characteristic.Brightness)
-        .on(CharacteristicEventTypes.GET, async (callback: CharacteristicGetCallback) => {
-          callback(undefined, this.accStates.Brightness);
-          this.updateBrightness();
-        })
-        .on(CharacteristicEventTypes.SET, async (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
-          this.setBrightness(value);
-          callback();
-        });
+    if (this.config.type == "switch") {
+
+      this.switchErrorCheck();
+      this.accessoryService = new hap.Service.Switch(this.name);
+
+      if (this.switchCheckOnOff()) {
+        this.accessoryService.getCharacteristic(hap.Characteristic.On)
+          .on(CharacteristicEventTypes.GET, async (callback: CharacteristicGetCallback) => {
+            callback(undefined, this.accStates.On);
+            this.switchUpdateOn();
+          })
+          .on(CharacteristicEventTypes.SET, async (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
+            this.switchSetOn(value);
+            callback();
+          });
+      }
+
+      if (this.config.updateIntervall) {
+        setInterval(() => {
+          if (this.switchCheckOnOff()) {
+            this.switchUpdateOn();
+          }
+        }, this.config.updateIntervall);
+      }
+
     }
 
-    if (this.checkHue()) {
-      this.lightbulbService.getCharacteristic(hap.Characteristic.Hue)
-        .on(CharacteristicEventTypes.GET, async (callback: CharacteristicGetCallback) => {
-          callback(undefined, this.accStates.Hue);
-          this.updateHue();
-        })
-        .on(CharacteristicEventTypes.SET, async (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
-          this.setHue(value);
-          callback();
-        });
-    }
+    if (this.config.type == "outlet") {
 
-    if (this.checkColorTemperature()) {
-      this.lightbulbService.getCharacteristic(hap.Characteristic.ColorTemperature)
-        .on(CharacteristicEventTypes.GET, async (callback: CharacteristicGetCallback) => {
-          callback(undefined, this.accStates.ColorTemperature);
-          this.updateColorTemperature();
-        })
-        .on(CharacteristicEventTypes.SET, async (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
-          this.setColorTemperature(value);
-          callback();
-        });
+      this.outletErrorCheck();
+      this.accessoryService = new hap.Service.Outlet(this.name);
+
+      if (this.outletCheckOnOff()) {
+        this.accessoryService.getCharacteristic(hap.Characteristic.On)
+          .on(CharacteristicEventTypes.GET, async (callback: CharacteristicGetCallback) => {
+            callback(undefined, this.accStates.On);
+            this.outletUpdateOn();
+          })
+          .on(CharacteristicEventTypes.SET, async (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
+            this.outletSetOn(value);
+            callback();
+          });
+      }
+
+      if (this.config.updateIntervall) {
+        setInterval(() => {
+          if (this.outletCheckOnOff()) {
+            this.outletUpdateOn();
+          }
+        }, this.config.updateIntervall);
+      }
+
     }
 
     this.informationService = new hap.Service.AccessoryInformation()
-      .setCharacteristic(hap.Characteristic.Manufacturer,     pjson.author.name)
-      .setCharacteristic(hap.Characteristic.Model,            pjson.model)
-      .setCharacteristic(hap.Characteristic.FirmwareRevision, pjson.version)
-      .setCharacteristic(hap.Characteristic.SerialNumber, md5(this.name + pjson.model));
+        .setCharacteristic(hap.Characteristic.Manufacturer,     pjson.author.name)
+        .setCharacteristic(hap.Characteristic.Model,            pjson.model)
+        .setCharacteristic(hap.Characteristic.FirmwareRevision, pjson.version)
+        .setCharacteristic(hap.Characteristic.SerialNumber, md5(this.name + pjson.model));
 
-    if (this.config.updateIntervall) {
-      setInterval(() => {
-        if (this.checkOnOff()) {
-          this.updateOn();
-        }
-        if (this.checkBrightness()) {
-          this.updateBrightness();
-        }
-        if (this.checkHue()) {
-          this.updateHue();
-        }
-        if (this.checkColorTemperature()) {
-          this.updateColorTemperature();
-        }
-      }, this.config.updateIntervall);
-    }
-
-    log.info("Lightbulb finished initializing!");
+    // log.info("Lightbulb finished initializing!");
   }
 
-  errorCheck() {
+  lightbulbErrorCheck() {
     if (this.config.lightbulbGetOn && this.config.lightbulbSetOn && this.config.lightbulbSetOff) {
       if (!this.config.lightbulbGetOn.url || !this.config.lightbulbGetOn.method || !this.config.lightbulbGetOn.pattern || 
         !this.config.lightbulbSetOn.url || !this.config.lightbulbSetOn.method || !this.config.lightbulbSetOff.url || !this.config.lightbulbSetOff.method) {
@@ -135,30 +193,66 @@ class HttpIotLightbulb implements AccessoryPlugin {
       this.log.error('Config is not correct!');
     }
   }
-  checkOnOff(): boolean {
+  lightbulbCheckOnOff(): boolean {
     let check = true;
     if (!this.config.lightbulbGetOn || !this.config.lightbulbSetOn || !this.config.lightbulbSetOff ) {
       check = false;
     }
     return check;
   }
-  checkBrightness(): boolean {
+  lightbulbCheckBrightness(): boolean {
     let check = true;
     if (!this.config.lightbulbGetBrightness || !this.config.lightbulbSetBrightness ) {
       check = false;
     }
     return check;
   }
-  checkHue(): boolean {
+  lightbulbCheckHue(): boolean {
     let check = true;
     if (!this.config.lightbulbGetHue || !this.config.lightbulbSetHue ) {
       check = false;
     }
     return check;
   }
-  checkColorTemperature(): boolean {
+  lightbulbCheckColorTemperature(): boolean {
     let check = true;
     if (!this.config.lightbulbGetColorTemperature || !this.config.lightbulbSetColorTemperature ) {
+      check = false;
+    }
+    return check;
+  }
+
+  switchErrorCheck() {
+    if (this.config.switchGetOn && this.config.switchSetOn && this.config.switchSetOff) {
+      if (!this.config.switchGetOn.url || !this.config.switchGetOn.method || !this.config.switchGetOn.pattern || 
+        !this.config.switchSetOn.url || !this.config.switchSetOn.method || !this.config.switchSetOff.url || !this.config.switchSetOff.method) {
+        this.log.error('Config is not correct!');
+      }
+    } else {
+      this.log.error('Config is not correct!');
+    }
+  }
+  switchCheckOnOff(): boolean {
+    let check = true;
+    if (!this.config.switchGetOn || !this.config.switchSetOn || !this.config.switchSetOff ) {
+      check = false;
+    }
+    return check;
+  }
+
+  outletErrorCheck() {
+    if (this.config.outletGetOn && this.config.outletSetOn && this.config.outletSetOff) {
+      if (!this.config.outletGetOn.url || !this.config.outletGetOn.method || !this.config.outletGetOn.pattern || 
+        !this.config.outletSetOn.url || !this.config.outletSetOn.method || !this.config.outletSetOff.url || !this.config.outletSetOff.method) {
+        this.log.error('Config is not correct!');
+      }
+    } else {
+      this.log.error('Config is not correct!');
+    }
+  }
+  outletCheckOnOff(): boolean {
+    let check = true;
+    if (!this.config.outletGetOn || !this.config.outletSetOn || !this.config.outletSetOff ) {
       check = false;
     }
     return check;
@@ -171,11 +265,11 @@ class HttpIotLightbulb implements AccessoryPlugin {
   getServices(): Service[] {
     return [
       this.informationService,
-      this.lightbulbService,
+      this.accessoryService,
     ];
   }
 
-  async updateOn() {
+  async lightbulbUpdateOn() {
     axios({
       method: this.config.lightbulbGetOn.method.toLowerCase(),
       url: this.config.lightbulbGetOn.url
@@ -190,7 +284,7 @@ class HttpIotLightbulb implements AccessoryPlugin {
         if (this.config.debugMsgLog) {
           this.log.info("Current On is: " + (this.accStates.On ? "ON": "OFF"));
         }
-        this.lightbulbService.updateCharacteristic(this.api.hap.Characteristic.On, on);
+        this.accessoryService.updateCharacteristic(this.api.hap.Characteristic.On, on);
       })
       .catch( (error: any) => {
         if (this.config.debugMsgLog) {
@@ -199,7 +293,7 @@ class HttpIotLightbulb implements AccessoryPlugin {
       });
   }
 
-  async setOn(value: CharacteristicValue) {
+  async lightbulbSetOn(value: CharacteristicValue) {
     this.accStates.On = value as boolean;
     let url: String;
     let method: String;
@@ -227,7 +321,7 @@ class HttpIotLightbulb implements AccessoryPlugin {
       });
   }
 
-  async updateBrightness() {
+  async lightbulbUpdateBrightness() {
     axios({
       method: this.config.lightbulbGetBrightness.method.toLowerCase(),
       url: this.config.lightbulbGetBrightness.url
@@ -247,7 +341,7 @@ class HttpIotLightbulb implements AccessoryPlugin {
           if (this.config.debugMsgLog) {
             this.log.info("Brightness is: %i", this.accStates.Brightness);
           }
-          this.lightbulbService.updateCharacteristic(this.api.hap.Characteristic.Brightness, this.accStates.Brightness);
+          this.accessoryService.updateCharacteristic(this.api.hap.Characteristic.Brightness, this.accStates.Brightness);
         } else {
           if (this.config.debugMsgLog) {
             this.log.info("Current Brightness is not correct: '%s'! [0 - 100]", brightnessString.trim());
@@ -261,7 +355,7 @@ class HttpIotLightbulb implements AccessoryPlugin {
       });
   }
 
-  async setBrightness(value: CharacteristicValue) {
+  async lightbulbSetBrightness(value: CharacteristicValue) {
     this.accStates.Brightness = value as number;
     let url: string    = this.config.lightbulbSetBrightness.url;
     if (this.config.lightbulbSetBrightness.replaceNumber) {
@@ -287,7 +381,7 @@ class HttpIotLightbulb implements AccessoryPlugin {
       });
   }
 
-  async updateHue() {
+  async lightbulbUpdateHue() {
     axios({
       method: this.config.lightbulbGetHue.method.toLowerCase(),
       url: this.config.lightbulbGetHue.url
@@ -307,7 +401,7 @@ class HttpIotLightbulb implements AccessoryPlugin {
           if (this.config.debugMsgLog) {
             this.log.info("Current Hue is: %i", this.accStates.Hue);
           }
-          this.lightbulbService.updateCharacteristic(this.api.hap.Characteristic.Hue, this.accStates.Hue);
+          this.accessoryService.updateCharacteristic(this.api.hap.Characteristic.Hue, this.accStates.Hue);
         } else {
           if (this.config.debugMsgLog) {
             this.log.info("Current Hue is not correct: '%s' (>> %i)! [0 - 360]", hueString.trim(), newHue);
@@ -321,7 +415,7 @@ class HttpIotLightbulb implements AccessoryPlugin {
       });
   }
 
-  async setHue(value: CharacteristicValue) {
+  async lightbulbSetHue(value: CharacteristicValue) {
     this.accStates.Hue = value as number;
     let url: string    = this.config.lightbulbSetHue.url;
     if (this.config.lightbulbSetHue.replaceNumber) {
@@ -347,7 +441,7 @@ class HttpIotLightbulb implements AccessoryPlugin {
       });
   }
 
-  async updateColorTemperature() {
+  async lightbulbUpdateColorTemperature() {
     axios({
       method: this.config.lightbulbGetColorTemperature.method.toLowerCase(),
       url: this.config.lightbulbGetColorTemperature.url
@@ -372,7 +466,7 @@ class HttpIotLightbulb implements AccessoryPlugin {
           if (this.config.debugMsgLog) {
             this.log.info("Current Color Temperature is: %i", this.accStates.ColorTemperature);
           }
-          this.lightbulbService.updateCharacteristic(this.api.hap.Characteristic.ColorTemperature, this.accStates.ColorTemperature);
+          this.accessoryService.updateCharacteristic(this.api.hap.Characteristic.ColorTemperature, this.accStates.ColorTemperature);
         } else {
           if (this.config.debugMsgLog) {
             this.log.info("Current Color Temperature is not correct: '%s' (>> %i mired)! [140 - 500 mired] [mired = 1000000 / kelvin]", colorTemperatureString.trim(), newColorTemperature);
@@ -386,7 +480,7 @@ class HttpIotLightbulb implements AccessoryPlugin {
       });
   }
 
-  async setColorTemperature(value: CharacteristicValue) {
+  async lightbulbSetColorTemperature(value: CharacteristicValue) {
     this.accStates.ColorTemperature = value as number;
     let newColorTemperature: number = this.accStates.ColorTemperature;
     if (this.config.lightbulbSetColorTemperature.unit == "kelvin") {
@@ -414,6 +508,110 @@ class HttpIotLightbulb implements AccessoryPlugin {
       .catch( (error: any) => {
         if (this.config.debugMsgLog) {
           this.log.info("Error in Set Color Temperature: %s", error.message);
+        }
+      });
+  }
+
+  async lightbulbUpdateOn() {
+    axios({
+      method: this.config.lightbulbGetOn.method.toLowerCase(),
+      url: this.config.lightbulbGetOn.url
+    })
+      .then( (response: any) => {
+        // this.log(response.data.trim());
+        let on = false;
+        if (response.data.trim() == this.config.lightbulbGetOn.pattern) {
+          on = true;
+        }
+        this.accStates.On = on;
+        if (this.config.debugMsgLog) {
+          this.log.info("Current On is: " + (this.accStates.On ? "ON": "OFF"));
+        }
+        this.accessoryService.updateCharacteristic(this.api.hap.Characteristic.On, on);
+      })
+      .catch( (error: any) => {
+        if (this.config.debugMsgLog) {
+          this.log.info("Error in Get On: %s", error.message);
+        }
+      });
+  }
+
+  async switchSetOn(value: CharacteristicValue) {
+    this.accStates.On = value as boolean;
+    let url: String;
+    let method: String;
+    if (value) {
+      url    = this.config.switchSetOn.url;
+      method = this.config.switchSetOn.method.toLowerCase(); 
+    } else {
+      url    = this.config.switchSetOff.url;
+      method = this.config.switchSetOff.method.toLowerCase(); 
+    }
+    axios({
+      method: method,
+      url: url
+    })
+      .then( (response: any) => {
+        // this.log(response.data.trim());
+        if (this.config.debugMsgLog) {
+          this.log.info("On was set to: " + (this.accStates.On ? "ON": "OFF"));
+        }
+      })
+      .catch( (error: any) => {
+        if (this.config.debugMsgLog) {
+          this.log.info("Error in Set On: %s", error.message);
+        }
+      });
+  }
+
+  async switchUpdateOn() {
+    axios({
+      method: this.config.switchGetOn.method.toLowerCase(),
+      url: this.config.switchGetOn.url
+    })
+      .then( (response: any) => {
+        // this.log(response.data.trim());
+        let on = false;
+        if (response.data.trim() == this.config.switchGetOn.pattern) {
+          on = true;
+        }
+        this.accStates.On = on;
+        if (this.config.debugMsgLog) {
+          this.log.info("Current On is: " + (this.accStates.On ? "ON": "OFF"));
+        }
+        this.accessoryService.updateCharacteristic(this.api.hap.Characteristic.On, on);
+      })
+      .catch( (error: any) => {
+        if (this.config.debugMsgLog) {
+          this.log.info("Error in Get On: %s", error.message);
+        }
+      });
+  }
+
+  async outletSetOn(value: CharacteristicValue) {
+    this.accStates.On = value as boolean;
+    let url: String;
+    let method: String;
+    if (value) {
+      url    = this.config.outletSetOn.url;
+      method = this.config.outletSetOn.method.toLowerCase(); 
+    } else {
+      url    = this.config.outletSetOff.url;
+      method = this.config.outletSetOff.method.toLowerCase(); 
+    }
+    axios({
+      method: method,
+      url: url
+    })
+      .then( (response: any) => {
+        // this.log(response.data.trim());
+        if (this.config.debugMsgLog) {
+          this.log.info("On was set to: " + (this.accStates.On ? "ON": "OFF"));
+        }
+      })
+      .catch( (error: any) => {
+        if (this.config.debugMsgLog) {
+          this.log.info("Error in Set On: %s", error.message);
         }
       });
   }

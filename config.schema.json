@@ -11,6 +11,11 @@
                 "required": true,
                 "default": "HTTP-IoT Accessory"
             },
+            "type": {
+                "title": "Type (lightbulb, switch or outlet)",
+                "type": "string",
+                "default": "lightbulb"
+            },
             "updateInterval": {
                 "title": "Update Interval (in MS)",
                 "type": "number",
@@ -48,37 +53,31 @@
                 }
             },
             "lightbulbSetOn": {
-                "required": true,
                 "type": "object",
                 "properties": {
                     "url": {
                         "title": "Url",
                         "type": "string",
-                        "required": true,
                         "default": "http://10.0.0.100/api/v1/led?power=1"
                     },
                     "method": {
                         "title": "Method",
                         "type": "string",
-                        "required": true,
                         "default": "POST"
                     }
                 }
             },
             "lightbulbSetOff": {
-                "required": true,
                 "type": "object",
                 "properties": {
                     "url": {
                         "title": "Url",
                         "type": "string",
-                        "required": true,
                         "default": "http://10.0.0.100/api/v1/led?power=0"
                     },
                     "method": {
                         "title": "Method",
                         "type": "string",
-                        "required": true,
                         "default": "POST"
                     }
                 }
@@ -227,6 +226,110 @@
                         "type": "string",
                         "placeholder": "%color_temp%",
                         "description": "Replace this strirng in the url with the value. If not set, the value is add to the end of the url."
+                    }
+                }
+            },
+
+            "switchGetOn": {
+                "type": "object",
+                "properties": {
+                    "url": {
+                        "title": "Url",
+                        "type": "string",
+                        "default": "http://10.0.0.100/api/v1/led?power"
+                    },
+                    "method": {
+                        "title": "Method",
+                        "type": "string",
+                        "default": "GET"
+                    },
+                    "pattern": {
+                        "title": "Pattern",
+                        "type": "string",
+                        "default": "power: 1",
+                        "description": "The response for a ON state."
+                    }
+                }
+            },
+            "switchSetOn": {
+                "type": "object",
+                "properties": {
+                    "url": {
+                        "title": "Url",
+                        "type": "string",
+                        "default": "http://10.0.0.100/api/v1/led?power=1"
+                    },
+                    "method": {
+                        "title": "Method",
+                        "type": "string",
+                        "default": "POST"
+                    }
+                }
+            },
+            "switchSetOff": {
+                "type": "object",
+                "properties": {
+                    "url": {
+                        "title": "Url",
+                        "type": "string",
+                        "default": "http://10.0.0.100/api/v1/led?power=0"
+                    },
+                    "method": {
+                        "title": "Method",
+                        "type": "string",
+                        "default": "POST"
+                    }
+                }
+            },
+
+            "outletGetOn": {
+                "type": "object",
+                "properties": {
+                    "url": {
+                        "title": "Url",
+                        "type": "string",
+                        "default": "http://10.0.0.100/api/v1/led?power"
+                    },
+                    "method": {
+                        "title": "Method",
+                        "type": "string",
+                        "default": "GET"
+                    },
+                    "pattern": {
+                        "title": "Pattern",
+                        "type": "string",
+                        "default": "power: 1",
+                        "description": "The response for a ON state."
+                    }
+                }
+            },
+            "outletSetOn": {
+                "type": "object",
+                "properties": {
+                    "url": {
+                        "title": "Url",
+                        "type": "string",
+                        "default": "http://10.0.0.100/api/v1/led?power=1"
+                    },
+                    "method": {
+                        "title": "Method",
+                        "type": "string",
+                        "default": "POST"
+                    }
+                }
+            },
+            "outletSetOff": {
+                "type": "object",
+                "properties": {
+                    "url": {
+                        "title": "Url",
+                        "type": "string",
+                        "default": "http://10.0.0.100/api/v1/led?power=0"
+                    },
+                    "method": {
+                        "title": "Method",
+                        "type": "string",
+                        "default": "POST"
                     }
                 }
             }
