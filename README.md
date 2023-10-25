@@ -46,6 +46,8 @@ Name                     | Value               | Required | Notes
 
 ## Lightbulb On Configuration Parameters ##
 
+The Lightbulb On Characteristic supports `text` and `json` as respons.
+
 Name                     | Value                       | Required | Notes
 ------------------------ | --------------------------- | -------- | ------------------------
 `lightbulbGetOn.url`     | "http://10.0.0.100/api/..." | yes      | The url for power control, to get the state.  
@@ -150,11 +152,33 @@ Name                                         | Value                       | Req
                 "replaceNumber": "%color_temp%",
                 "unit": "kelvin"
             }
+        },
+        {
+            "accessory": "HTTP-IoT",
+            "name": "Tasmota WLan lightbulb",
+            "type": "lightbulb",
+            "updateIntervall": 10000,
+            "debugMsgLog": 1,
+            "lightbulbGetOn": {
+                "url": "http://10.0.0.101/cm?cmnd=Power%20Status",
+                "method": "GET",
+                "pattern": "{\"POWER\":\"ON\"}"
+            },
+            "lightbulbSetOn": {
+                "url": "http://10.0.0.101/cm?cmnd=Power%20On",
+                "method": "POST"
+            },
+            "lightbulbSetOff": {
+                "url": "http://10.0.0.101/cm?cmnd=Power%20Off",
+                "method": "POST"
+            }
         }
     ]
 ```
 
 ## Switch Configuration Parameters ##
+
+The Switch On Characteristic supports `text` and `json` as respons.
 
 Name                  | Value                       | Required | Notes
 ----------------------| --------------------------- | -------- | ------------------------
@@ -187,11 +211,33 @@ Name                  | Value                       | Required | Notes
                 "url": "http://10.0.0.100/api/v1/led?power=0",
                 "method": "POST"
             }
+        },
+        {
+            "accessory": "HTTP-IoT",
+            "name": "Tasmota WLan Switch",
+            "type": "switch",
+            "updateIntervall": 10000,
+            "debugMsgLog": 1,
+            "switchGetOn": {
+                "url": "http://10.0.0.101/cm?cmnd=Power%20Status",
+                "method": "GET",
+                "pattern": "{\"POWER\":\"ON\"}"
+            },
+            "switchSetOn": {
+                "url": "http://10.0.0.101/cm?cmnd=Power%20On",
+                "method": "POST"
+            },
+            "switchSetOff": {
+                "url": "http://10.0.0.101/cm?cmnd=Power%20Off",
+                "method": "POST"
+            }
         }
     ]
 ```
 
 ## Outlet Configuration Parameters ##
+
+The Outlet On Characteristic supports `text` and `json` as respons.
 
 Name                  | Value                       | Required | Notes
 ----------------------| --------------------------- | -------- | ------------------------
@@ -222,6 +268,26 @@ Name                  | Value                       | Required | Notes
             },
             "outletSetOff": {
                 "url": "http://10.0.0.100/api/v1/led?power=0",
+                "method": "POST"
+            }
+        },
+        {
+            "accessory": "HTTP-IoT",
+            "name": "Tasmota WLan Outlet",
+            "type": "outlet",
+            "updateIntervall": 10000,
+            "debugMsgLog": 1,
+            "outletGetOn": {
+                "url": "http://10.0.0.101/cm?cmnd=Power%20Status",
+                "method": "GET",
+                "pattern": "{\"POWER\":\"ON\"}"
+            },
+            "outletSetOn": {
+                "url": "http://10.0.0.101/cm?cmnd=Power%20On",
+                "method": "POST"
+            },
+            "outletSetOff": {
+                "url": "http://10.0.0.101/cm?cmnd=Power%20Off",
                 "method": "POST"
             }
         }
