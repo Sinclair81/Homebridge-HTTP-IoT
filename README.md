@@ -17,6 +17,12 @@ __Type of Accessory:__
 - Switch
 - Outlet
 
+__Type of IoT devices:__
+
+- Arduino with own IoT API (response as a plain text)
+- Tasmota (response as a json string)
+- Shelly (response as a json object)
+
 __Configuration:__
 
 - [Main Configuration](#HTTP-IoT-Main-Configuration-Parameters)  
@@ -53,6 +59,7 @@ Name                     | Value                       | Required | Notes
 `lightbulbGetOn.url`     | "http://10.0.0.100/api/..." | yes      | The url for power control, to get the state.  
 `lightbulbGetOn.method`  | "GET"                       | yes      | The HTTP method.  
 `lightbulbGetOn.pattern` | "power: 1"                  | yes      | The response for a `on` or `1`  
+`lightbulbGetOn.json`    | "ison"                      | no       | The json item, if the response is a json object.  
 `lightbulbSetOn.url`     | "http://10.0.0.100/api/..." | yes      | The url for power control, to set ON.  
 `lightbulbSetOn.method`  | "POST"                      | yes      | The HTTP method.  
 `lightbulbSetOff.url`    | "http://10.0.0.100/api/..." | yes      | The url for power control, to set OFF.  
@@ -66,6 +73,7 @@ Name                                   | Value                       | Required 
 `lightbulbGetBrightness.method`        | "GET"                       | yes*     | The HTTP method.  
 `lightbulbGetBrightness.removeBefore`  | "brightness: "              | no       | Remove this string in the response before the value.  
 `lightbulbGetBrightness.removeAfter`   | ""                          | no       | Remove this string in the response after the value.  
+`lightbulGetBrightness.json`           | "brightness"                | no       | The json item, if the response is a json object.  
 `lightbulbSetBrightness.url`           | "http://10.0.0.100/api/..." | yes*     | The url for brightness control.  
 `lightbulbSetBrightness.method`        | "POST"                      | yes*     | The HTTP method.  
 `lightbulbSetBrightness.replaceNumber` | "%brightness%"              | no       | This string is replace with the value in the url. If not set, the value is add to the url.  
@@ -78,6 +86,7 @@ Name                            | Value                       | Required | Notes
 `lightbulbGetHue.method`        | "GET"                       | yes*     | The HTTP method.  
 `lightbulbGetHue.removeBefore`  | "hue: "                     | no       | Remove this string in the response before the value.  
 `lightbulbGetHue.removeAfter`   | ""                          | no       | Remove this string in the response after the value.  
+`lightbulbGetHue.json`          | "hue"                       | no       | The json item, if the response is a json 
 `lightbulbSetHue.url`           | "http://10.0.0.100/api/..." | yes*     | The url for hue control.  
 `lightbulbSetHue.method`        | "POST"                      | yes*     | The HTTP method.  
 `lightbulbSetHue.replaceNumber` | "%hue%"                     | no       | This string is replace with the value in the url. If not set, the value is add to the url.  
@@ -92,6 +101,7 @@ Name                                         | Value                       | Req
 `lightbulbGetColorTemperature.method`        | "GET"                       | yes*     | The HTTP method.  
 `lightbulbGetColorTemperature.removeBefore`  | "color_temp: "              | no       | Remove this string in the response before the value.  
 `lightbulbGetColorTemperature.removeAfter`   | ""                          | no       | Remove this string in the response after the value.  
+`lightbulbGetColorTemperature.json`          | "color_temp"                | no       | The json item, if the response is a json 
 `lightbulbSetColorTemperature.url`           | "http://10.0.0.100/api/..." | yes*     | The url for color temperature control.  
 `lightbulbSetColorTemperature.method`        | "POST"                      | yes*     | The HTTP method.  
 `lightbulbSetColorTemperature.replaceNumber` | "%color_temp%"              | no       | This string is replace with the value in the url. If not set, the value is add to the url.  
@@ -172,6 +182,37 @@ Name                                         | Value                       | Req
                 "url": "http://10.0.0.101/cm?cmnd=Power%20Off",
                 "method": "POST"
             }
+        },
+        {
+            "accessory": "HTTP-IoT",
+            "name": "Shelly Dimmer",
+            "type": "lightbulb",
+            "updateIntervall": 10000,
+            "debugMsgLog": 1,
+            "lightbulbGetOn": {
+                "url": "http://10.0.0.103/light/0",
+                "method": "GET",
+                "pattern": "true",
+                "json": "ison"
+            },
+            "lightbulbSetOn": {
+                "url": "http://10.0.0.103/light/0?turn=on",
+                "method": "GET"
+            },
+            "lightbulbSetOff": {
+                "url": "http://10.0.0.103/light/0?turn=off",
+                "method": "GET"
+            },
+            "lightbulbGetBrightness": {
+                "url": "http://10.0.0.103/light/0",
+                "method": "GET",
+                "json": "brightness"
+            },
+            "lightbulbSetBrightness": {
+                "url": "http://10.0.0.103/light/0?brightness=%brightness%",
+                "method": "GET",
+                "replaceNumber": "%brightness%"
+            }
         }
     ]
 ```
@@ -185,6 +226,7 @@ Name                  | Value                       | Required | Notes
 `switchGetOn.url`     | "http://10.0.0.100/api/..." | yes      | The url for power control, to get the state.  
 `switchGetOn.method`  | "GET"                       | yes      | The HTTP method.  
 `switchGetOn.pattern` | "power: 1"                  | yes      | The response for a `on` or `1`  
+`switchGetOn.json`    | "ison"                      | no       | The json item, if the response is a json object. 
 `switchSetOn.url`     | "http://10.0.0.100/api/..." | yes      | The url for power control, to set ON.  
 `switchSetOn.method`  | "POST"                      | yes      | The HTTP method.  
 `switchSetOff.url`    | "http://10.0.0.100/api/..." | yes      | The url for power control, to set OFF.  
@@ -231,7 +273,28 @@ Name                  | Value                       | Required | Notes
                 "url": "http://10.0.0.101/cm?cmnd=Power%20Off",
                 "method": "POST"
             }
-        }
+        },
+        {
+            "accessory": "HTTP-IoT",
+            "name": "Shelly Switch",
+            "type": "switch",
+            "updateIntervall": 10000,
+            "debugMsgLog": 1,
+            "switchGetOn": {
+                "url": "http://10.0.0.102/relay/0",
+                "method": "GET",
+                "pattern": "true",
+                "json": "ison"
+            },
+            "switchSetOn": {
+                "url": "http://10.0.0.102/relay/0?turn=on",
+                "method": "GET"
+            },
+            "switchSetOff": {
+                "url": "http://10.0.0.102/relay/0?turn=off",
+                "method": "GET"
+            }
+        },
     ]
 ```
 
@@ -244,6 +307,7 @@ Name                  | Value                       | Required | Notes
 `outletGetOn.url`     | "http://10.0.0.100/api/..." | yes      | The url for power control, to get the state.  
 `outletGetOn.method`  | "GET"                       | yes      | The HTTP method.  
 `outletGetOn.pattern` | "power: 1"                  | yes      | The response for a `on` or `1`  
+`outletGetOn.json`    | "ison"                      | no       | The json item, if the response is a json object. 
 `outletSetOn.url`     | "http://10.0.0.100/api/..." | yes      | The url for power control, to set ON.  
 `outletSetOn.method`  | "POST"                      | yes      | The HTTP method.  
 `outletSetOff.url`    | "http://10.0.0.100/api/..." | yes      | The url for power control, to set OFF.  
@@ -290,7 +354,28 @@ Name                  | Value                       | Required | Notes
                 "url": "http://10.0.0.101/cm?cmnd=Power%20Off",
                 "method": "POST"
             }
-        }
+        },
+        {
+            "accessory": "HTTP-IoT",
+            "name": "Shelly Outlet",
+            "type": "outlet",
+            "updateIntervall": 10000,
+            "debugMsgLog": 1,
+            "outletGetOn": {
+                "url": "http://10.0.0.102/relay/0",
+                "method": "GET",
+                "pattern": "true",
+                "json": "ison"
+            },
+            "outletSetOn": {
+                "url": "http://10.0.0.102/relay/0?turn=on",
+                "method": "GET"
+            },
+            "outletSetOff": {
+                "url": "http://10.0.0.102/relay/0?turn=off",
+                "method": "GET"
+            }
+        },
     ]
 ```
 
