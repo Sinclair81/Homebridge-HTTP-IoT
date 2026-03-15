@@ -1,7 +1,7 @@
 {
   "displayName": "Homebridge HTTP IoT",
   "name": "homebridge-http-iot",
-  "version": "1.3.2",
+  "version": "1.4.0",
   "model": "HTTP-IoT Lightbulb",
   "description": "Control your IoT device with HTTP requests.",
   "main": "dist/index.js",

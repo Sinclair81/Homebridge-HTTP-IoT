@@ -102,6 +102,7 @@ export class LightbulbAccessory {
       url: this.config.lightbulbGetBrightness.url
     })
       .then( (response: any) => {
+        /*
         let brightnessString: string = response.data.trim();
         if (this.config.lightbulbGetBrightness.removeBefore) {
           brightnessString = brightnessString.replace(this.config.lightbulbGetBrightness.removeBefore, "");
@@ -110,6 +111,9 @@ export class LightbulbAccessory {
           brightnessString = brightnessString.replace(this.config.lightbulbGetBrightness.removeAfter, "");
         }
         const newBrightness: number = parseInt(brightnessString.trim(), 10);
+        */
+
+        let newBrightness = this.checkBrightnessRespons(response);
         if (newBrightness >= 0 && newBrightness <= 100) {
           this.accStates.Brightness = newBrightness;
           if (this.config.debugMsgLog) {
@@ -118,7 +122,7 @@ export class LightbulbAccessory {
           this.lightbulbService.updateCharacteristic(this.api.hap.Characteristic.Brightness, this.accStates.Brightness);
         } else {
           if (this.config.debugMsgLog) {
-            this.log.info("Current Brightness is not correct: '%s'! [0 - 100]", brightnessString.trim());
+            this.log.info("Current Brightness is not correct: '%i'! [0 - 100]", newBrightness);
           }
         }
       })
@@ -290,15 +294,72 @@ export class LightbulbAccessory {
         on = true;
       }
     } else {                                  // application/json
-      responseData = JSON.stringify(response.data);
+      if (!this.config.lightbulbGetOn.json) {    // no JSON set
+        responseData = JSON.stringify(response.data);
+      } else {                                // JSON is set
+        responseData = JSON.stringify(response.data[this.config.lightbulbGetOn.json]);
+      }
       if (responseData == this.config.lightbulbGetOn.pattern) {
         on = true;
       }
     }
     if (this.config.debugMsgLog) {
-      this.log.info("On response type is '" + responseType + "' and data is '" + responseData + "'");
+      let json_txt = "";
+      if (this.config.lightbulbGetOn.json) {
+        json_txt = " json is '" + this.config.lightbulbGetOn.json + "'";
+      }
+      this.log.info("On response type is '" + responseType + "'" + json_txt + " and data is '" + responseData + "'");
     }
     return on;
+  }
+
+  checkBrightnessRespons(response: any): number {
+    /*
+    let brightnessString: string = response.data.trim();
+    if (this.config.lightbulbGetBrightness.removeBefore) {
+      brightnessString = brightnessString.replace(this.config.lightbulbGetBrightness.removeBefore, "");
+    }
+    if (this.config.lightbulbGetBrightness.removeAfter) {
+      brightnessString = brightnessString.replace(this.config.lightbulbGetBrightness.removeAfter, "");
+    }
+    const newBrightness: number = parseInt(brightnessString.trim(), 10);
+    */
+    let brightness = 0;
+
+    let responseType: string = response["headers"]["content-type"];
+    responseType = responseType.toLocaleLowerCase();
+    let responseData: string;
+    
+    if (responseType.indexOf("text") != -1) { // text/plain
+
+      responseData = response.data.trim();
+      if (this.config.lightbulbGetBrightness.removeBefore) {
+        responseData = responseData.replace(this.config.lightbulbGetBrightness.removeBefore, "");
+      }
+      if (this.config.lightbulbGetBrightness.removeAfter) {
+        responseData = responseData.replace(this.config.lightbulbGetBrightness.removeAfter, "");
+      }
+      brightness = parseInt(responseData.trim(), 10);
+
+    } else {                                  // application/json
+
+      if (!this.config.lightbulbGetBrightness.json) { // no JSON set
+        responseData = JSON.stringify(response.data);
+      } else {                                // JSON is set
+        responseData = JSON.stringify(response.data[this.config.lightbulbGetBrightness.json]);
+      }
+      brightness = parseInt(responseData.trim(), 10);
+    }
+
+    if (this.config.debugMsgLog) {
+      let json_txt = "";
+      if (this.config.lightbulbGetBrightness.json) {
+        json_txt = " json is '" + this.config.lightbulbGetBrightness.json + "'";
+      }
+      this.log.info("On response type is '" + responseType + "'" + json_txt + " and data is '" + responseData + "'");
+    }
+
+    return brightness;
   }
 
   lightbulbErrorCheck() {

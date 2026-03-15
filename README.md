@@ -27,9 +27,9 @@ __Configuration:__
 
 - [Main Configuration](#HTTP-IoT-Main-Configuration-Parameters)  
 - [Lightbulb On Configuration](#Lightbulb-On-Configuration-Parameters)  
-- [Lightbulb Brightness Configuration](#Lightbulb-Brightness-Configuration-Parameters-(is-Optional))  
-- [Lightbulb Hue Configuration](#Lightbulb-Hue-Configuration-Parameters-(is-Optional))  
-- [Lightbulb Color Temperature Configuration](#Lightbulb-Color-Temperature-Configuration-Parameters-(is-Optional))  
+- [Lightbulb Brightness Configuration](#Lightbulb-Brightness-Configuration-Parameters)  
+- [Lightbulb Hue Configuration](#Lightbulb-Hue-Configuration-Parameters)  
+- [Lightbulb Color Temperature Configuration](#Lightbulb-Color-Temperature-Configuration-Parameters)  
 - [Lightbulb Example Configuration](#Lightbulb-Example-Configuration)  
 - [Switch Configuration](#Switch-Configuration-Parameters)  
 - [Outlet Configuration](#Outlet-Configuration-Parameters)  
@@ -61,12 +61,14 @@ Name                     | Value                       | Required | Notes
 `lightbulbGetOn.pattern` | "power: 1"                  | yes      | The response for a `on` or `1`  
 `lightbulbGetOn.json`    | "ison"                      | no       | The json item, if the response is a json object.  
 `lightbulbSetOn.url`     | "http://10.0.0.100/api/..." | yes      | The url for power control, to set ON.  
-`lightbulbSetOn.method`  | "POST"                      | yes      | The HTTP method.  
+`lightbulbSetOn.method`  | "GET"                       | yes      | The HTTP method.  
 `lightbulbSetOff.url`    | "http://10.0.0.100/api/..." | yes      | The url for power control, to set OFF.  
-`lightbulbSetOff.method` | "POST"                      | yes      | The HTTP method.  
+`lightbulbSetOff.method` | "GET"                       | yes      | The HTTP method.  
 
-## Lightbulb Brightness Configuration Parameters (is Optional) ##
+## Lightbulb Brightness Configuration Parameters ##
 
+#### is Optional ####  
+  
 Name                                   | Value                       | Required | Notes
 -------------------------------------- | --------------------------- | -------- | ------------------------
 `lightbulbGetBrightness.url`           | "http://10.0.0.100/api/..." | yes*     | The url for brightness control, to get the state.  
@@ -75,11 +77,13 @@ Name                                   | Value                       | Required 
 `lightbulbGetBrightness.removeAfter`   | ""                          | no       | Remove this string in the response after the value.  
 `lightbulGetBrightness.json`           | "brightness"                | no       | The json item, if the response is a json object.  
 `lightbulbSetBrightness.url`           | "http://10.0.0.100/api/..." | yes*     | The url for brightness control.  
-`lightbulbSetBrightness.method`        | "POST"                      | yes*     | The HTTP method.  
+`lightbulbSetBrightness.method`        | "GET"                       | yes*     | The HTTP method.  
 `lightbulbSetBrightness.replaceNumber` | "%brightness%"              | no       | This string is replace with the value in the url. If not set, the value is add to the url.  
 
-## Lightbulb Hue Configuration Parameters (is Optional) ##
-
+## Lightbulb Hue Configuration Parameters ##  
+  
+#### is Optional ####
+  
 Name                            | Value                       | Required | Notes
 ------------------------------- | --------------------------- | -------- | ------------------------
 `lightbulbGetHue.url`           | "http://10.0.0.100/api/..." | yes*     | The url for hue control, to get the state.  
@@ -88,10 +92,12 @@ Name                            | Value                       | Required | Notes
 `lightbulbGetHue.removeAfter`   | ""                          | no       | Remove this string in the response after the value.  
 `lightbulbGetHue.json`          | "hue"                       | no       | The json item, if the response is a json 
 `lightbulbSetHue.url`           | "http://10.0.0.100/api/..." | yes*     | The url for hue control.  
-`lightbulbSetHue.method`        | "POST"                      | yes*     | The HTTP method.  
+`lightbulbSetHue.method`        | "GET"                       | yes*     | The HTTP method.  
 `lightbulbSetHue.replaceNumber` | "%hue%"                     | no       | This string is replace with the value in the url. If not set, the value is add to the url.  
 
-## Lightbulb Color Temperature Configuration Parameters (is Optional) ##
+## Lightbulb Color Temperature Configuration Parameters ##
+
+#### is Optional ####
 
 The Home app in IOS crashes when trying to change this value as a color instead of the color temperature. (10'2023)
 
@@ -103,11 +109,13 @@ Name                                         | Value                       | Req
 `lightbulbGetColorTemperature.removeAfter`   | ""                          | no       | Remove this string in the response after the value.  
 `lightbulbGetColorTemperature.json`          | "color_temp"                | no       | The json item, if the response is a json 
 `lightbulbSetColorTemperature.url`           | "http://10.0.0.100/api/..." | yes*     | The url for color temperature control.  
-`lightbulbSetColorTemperature.method`        | "POST"                      | yes*     | The HTTP method.  
+`lightbulbSetColorTemperature.method`        | "GET"                       | yes*     | The HTTP method.  
 `lightbulbSetColorTemperature.replaceNumber` | "%color_temp%"              | no       | This string is replace with the value in the url. If not set, the value is add to the url.  
 `lightbulbSetColorTemperature.unit`          | "kelvin"                    | no       | Set unit to `"kelvin"` if the device supports Kelvin instead of HomeKit unit Mired. (Mired = 1,000,000 / Kelvin)  
 
 ## Lightbulb Example Configuration ##
+
+HTTP API Example:  
 
 ```json
 "accessories": [
@@ -124,11 +132,11 @@ Name                                         | Value                       | Req
             },
             "lightbulbSetOn": {
                 "url": "http://10.0.0.100/api/v1/led?power=1",
-                "method": "POST"
+                "method": "GET"
             },
             "lightbulbSetOff": {
                 "url": "http://10.0.0.100/api/v1/led?power=0",
-                "method": "POST"
+                "method": "GET"
             },
             "lightbulbGetBrightness": {
                 "url": "http://10.0.0.100/api/v1/led?brightness",
@@ -137,7 +145,7 @@ Name                                         | Value                       | Req
             },
             "lightbulbSetBrightness": {
                 "url": "http://10.0.0.100/api/v1/led?brightness=%brightness%",
-                "method": "POST",
+                "method": "GET",
                 "replaceNumber": "%brightness%"
             },
             "lightbulbGetHue": {
@@ -147,7 +155,7 @@ Name                                         | Value                       | Req
             },
             "lightbulbSetHue": {
                 "url": "http://10.0.0.100/api/v1/led?hue=%hue%",
-                "method": "POST",
+                "method": "GET",
                 "replaceNumber": "%hue%"
             },
             "lightbulbGetColorTemperature": {
@@ -158,11 +166,18 @@ Name                                         | Value                       | Req
             },
             "lightbulbSetColorTemperature": {
                 "url": "http://10.0.0.100/api/v1/led?color_temp=%color_temp%",
-                "method": "POST",
+                "method": "GET",
                 "replaceNumber": "%color_temp%",
                 "unit": "kelvin"
             }
-        },
+        }
+    ]
+```
+
+Tasmota Example:  
+
+```json
+"accessories": [
         {
             "accessory": "HTTP-IoT",
             "name": "Tasmota WLan lightbulb",
@@ -176,13 +191,20 @@ Name                                         | Value                       | Req
             },
             "lightbulbSetOn": {
                 "url": "http://10.0.0.101/cm?cmnd=Power%20On",
-                "method": "POST"
+                "method": "GET"
             },
             "lightbulbSetOff": {
                 "url": "http://10.0.0.101/cm?cmnd=Power%20Off",
-                "method": "POST"
+                "method": "GET"
             }
-        },
+        }
+    ]
+```
+
+Shelly Example:  
+
+```json
+"accessories": [
         {
             "accessory": "HTTP-IoT",
             "name": "Shelly Dimmer",
@@ -228,9 +250,13 @@ Name                  | Value                       | Required | Notes
 `switchGetOn.pattern` | "power: 1"                  | yes      | The response for a `on` or `1`  
 `switchGetOn.json`    | "ison"                      | no       | The json item, if the response is a json object. 
 `switchSetOn.url`     | "http://10.0.0.100/api/..." | yes      | The url for power control, to set ON.  
-`switchSetOn.method`  | "POST"                      | yes      | The HTTP method.  
+`switchSetOn.method`  | "GET"                       | yes      | The HTTP method.  
 `switchSetOff.url`    | "http://10.0.0.100/api/..." | yes      | The url for power control, to set OFF.  
-`switchSetOff.method` | "POST"                      | yes      | The HTTP method.  
+`switchSetOff.method` | "GET"                       | yes      | The HTTP method.  
+
+## Switch Example Configuration ##
+
+HTTP API Example:  
 
 ```json
 "accessories": [
@@ -247,13 +273,20 @@ Name                  | Value                       | Required | Notes
             },
             "switchSetOn": {
                 "url": "http://10.0.0.100/api/v1/led?power=1",
-                "method": "POST"
+                "method": "GET"
             },
             "switchSetOff": {
                 "url": "http://10.0.0.100/api/v1/led?power=0",
-                "method": "POST"
+                "method": "GET"
             }
-        },
+        }
+    ]
+```
+
+Tasmota Example:  
+
+```json
+"accessories": [
         {
             "accessory": "HTTP-IoT",
             "name": "Tasmota WLan Switch",
@@ -267,13 +300,20 @@ Name                  | Value                       | Required | Notes
             },
             "switchSetOn": {
                 "url": "http://10.0.0.101/cm?cmnd=Power%20On",
-                "method": "POST"
+                "method": "GET"
             },
             "switchSetOff": {
                 "url": "http://10.0.0.101/cm?cmnd=Power%20Off",
-                "method": "POST"
+                "method": "GET"
             }
-        },
+        }
+    ]
+```
+
+Shelly Example:  
+
+```json
+"accessories": [
         {
             "accessory": "HTTP-IoT",
             "name": "Shelly Switch",
@@ -294,7 +334,7 @@ Name                  | Value                       | Required | Notes
                 "url": "http://10.0.0.102/relay/0?turn=off",
                 "method": "GET"
             }
-        },
+        }
     ]
 ```
 
@@ -309,9 +349,13 @@ Name                  | Value                       | Required | Notes
 `outletGetOn.pattern` | "power: 1"                  | yes      | The response for a `on` or `1`  
 `outletGetOn.json`    | "ison"                      | no       | The json item, if the response is a json object. 
 `outletSetOn.url`     | "http://10.0.0.100/api/..." | yes      | The url for power control, to set ON.  
-`outletSetOn.method`  | "POST"                      | yes      | The HTTP method.  
+`outletSetOn.method`  | "GET"                       | yes      | The HTTP method.  
 `outletSetOff.url`    | "http://10.0.0.100/api/..." | yes      | The url for power control, to set OFF.  
-`outletSetOff.method` | "POST"                      | yes      | The HTTP method.  
+`outletSetOff.method` | "GET"                       | yes      | The HTTP method.  
+
+## Outlet Example Configuration ##
+
+HTTP API Example:  
 
 ```json
 "accessories": [
@@ -328,13 +372,20 @@ Name                  | Value                       | Required | Notes
             },
             "outletSetOn": {
                 "url": "http://10.0.0.100/api/v1/led?power=1",
-                "method": "POST"
+                "method": "GET"
             },
             "outletSetOff": {
                 "url": "http://10.0.0.100/api/v1/led?power=0",
-                "method": "POST"
+                "method": "GET"
             }
-        },
+        }
+    ]
+```
+
+Tasmota Example:  
+
+```json
+"accessories": [
         {
             "accessory": "HTTP-IoT",
             "name": "Tasmota WLan Outlet",
@@ -348,13 +399,20 @@ Name                  | Value                       | Required | Notes
             },
             "outletSetOn": {
                 "url": "http://10.0.0.101/cm?cmnd=Power%20On",
-                "method": "POST"
+                "method": "GET"
             },
             "outletSetOff": {
                 "url": "http://10.0.0.101/cm?cmnd=Power%20Off",
-                "method": "POST"
+                "method": "GET"
             }
-        },
+        }
+    ]
+```
+
+Shelly Example:  
+
+```json
+"accessories": [
         {
             "accessory": "HTTP-IoT",
             "name": "Shelly Outlet",
@@ -375,7 +433,7 @@ Name                  | Value                       | Required | Notes
                 "url": "http://10.0.0.102/relay/0?turn=off",
                 "method": "GET"
             }
-        },
+        }
     ]
 ```
 

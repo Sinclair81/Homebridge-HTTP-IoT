@@ -99,13 +99,21 @@ export class OutletAccessory {
         on = true;
       }
     } else {                                  // application/json
-      responseData = JSON.stringify(response.data);
+      if (!this.config.outletGetOn.json) {    // no JSON set
+        responseData = JSON.stringify(response.data);
+      } else {                                // JSON is set
+        responseData = JSON.stringify(response.data[this.config.outletGetOn.json]);
+      }
       if (responseData == this.config.outletGetOn.pattern) {
         on = true;
       }
     }
     if (this.config.debugMsgLog) {
-      this.log.info("On response type is '" + responseType + "' and data is '" + responseData + "'");
+      let json_txt = "";
+      if (this.config.outletGetOn.json) {
+        json_txt = " json is '" + this.config.outletGetOn.json + "'";
+      }
+      this.log.info("On response type is '" + responseType + "'" + json_txt + " and data is '" + responseData + "'");
     }
     return on;
   }
